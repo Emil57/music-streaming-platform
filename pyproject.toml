@@ -9,6 +9,9 @@ dependencies = [
     "pyspark>=4.3,<5",
 ]
 
+[project.scripts]
+msp-generate = "music_streaming.generator:main"
+
 [dependency-groups]
 dev = [
     "pytest>=9.2.0",

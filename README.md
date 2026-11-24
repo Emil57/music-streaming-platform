@@ -38,6 +38,21 @@ export JAVA_HOME=/path/to/jdk-17
 java -version
 ```
 
+### Windows only: Hadoop native binaries
+
+Spark uses Hadoop's filesystem layer, which on Windows needs `winutils.exe` and `hadoop.dll`
+to list folders and write files. PySpark does not ship them. Download both from
+[cdarlint/winutils](https://github.com/cdarlint/winutils) (`hadoop-3.3.6/bin`, a community
+build) into `C:\hadoop\bin`, then:
+
+```powershell
+setx HADOOP_HOME "C:\hadoop"
+# and add C:\hadoop\bin to your user PATH, then restart the terminal/IDE
+```
+
+Without them you get `UnsatisfiedLinkError: ... NativeIO$Windows.access0` when reading a folder.
+Linux and macOS do not need this.
+
 ## Local setup
 
 ```bash
@@ -79,6 +94,21 @@ with spark_session(SparkConfig(app_name="daily-streams")) as spark:
 
 Source datasets, their grain, keys and ingestion rules are documented in
 [docs/data-model.md](docs/data-model.md).
+
+## Synthetic data
+
+Generate reproducible raw data (written to `data/raw/<dataset>/part-NNNNN.json`, git-ignored):
+
+```bash
+uv run msp-generate                                  # defaults: 10k users, 1M listening events
+uv run msp-generate --events 5000000 --seed 7        # bigger, different seed
+uv run msp-generate --format csv --output data/raw_csv
+uv run msp-generate --help                           # all options
+```
+
+The defaults take about 30 seconds and ~190 MB. Same seed means byte-identical output; each
+dataset uses its own random stream, so changing `--events` does not change users or tracks.
+Track popularity and user activity follow a long-tail distribution, like real streaming data.
 
 ## Troubleshooting
 
