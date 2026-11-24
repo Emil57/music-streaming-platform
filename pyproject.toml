@@ -1,0 +1,42 @@
+[project]
+name = "music-streaming"
+version = "0.1.0"
+description = "Music streaming analytics platform built with PySpark"
+readme = "README.md"
+authors = [{ name = "Emil57" }]
+requires-python = ">=3.13"
+dependencies = [
+    "pyspark>=4.3,<5",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "ruff>=0.17.6",
+]
+
+[build-system]
+requires = ["uv_build>=0.13.7,<0.14.0"]
+build-backend = "uv_build"
+
+[tool.ruff]
+line-length = 100
+target-version = "py313"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort (import order)
+    "B",   # flake8-bugbear (likely bugs)
+    "UP",  # pyupgrade (modern syntax)
+    "SIM", # flake8-simplify
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = ["-ra", "--strict-markers"]
+markers = [
+    "spark: tests that start a local SparkSession (need Java 17+)",
+]
