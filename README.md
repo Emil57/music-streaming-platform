@@ -75,6 +75,11 @@ with spark_session(SparkConfig(app_name="daily-streams")) as spark:
 | `MSP_SPARK_MASTER` | unset | Cluster URL, e.g. `local[4]`. Leave unset in production so `spark-submit --master` decides; locally PySpark then uses `local[*]` |
 | `MSP_SPARK_SHUFFLE_PARTITIONS` | `8` | `spark.sql.shuffle.partitions` (Spark's default of 200 is sized for clusters) |
 
+## Data model
+
+Source datasets, their grain, keys and ingestion rules are documented in
+[docs/data-model.md](docs/data-model.md).
+
 ## Troubleshooting
 
 - **Spark hangs or fails with `UnsupportedClassVersionError`**: Spark is using an old Java.
