@@ -33,6 +33,28 @@ def java_major_version() -> int | None:
     return int(match.group(2)) if major == 1 else major
 
 
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    # Any test that uses the `spark` fixture is a Spark test.
+    for item in items:
+        if "spark" in getattr(item, "fixturenames", ()):
+            item.add_marker(pytest.mark.spark)
+
+
+@pytest.fixture(scope="module")
+def spark():
+    """One local SparkSession per test module, stopped when the module finishes."""
+    from music_streaming.spark import SparkConfig, spark_session
+
+    config = SparkConfig(
+        app_name="msp-tests",
+        master="local[1]",
+        shuffle_partitions=1,
+        extra_conf={"spark.ui.enabled": "false"},
+    )
+    with spark_session(config) as session:
+        yield session
+
+
 def pytest_runtest_setup(item: pytest.Item) -> None:
     # An incompatible Java makes Spark hang instead of erroring, so fail fast with a clear message.
     if item.get_closest_marker("spark") is None:
