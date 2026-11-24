@@ -55,6 +55,26 @@ uv run ruff check .           # lint
 uv run ruff format .          # format
 ```
 
+## Spark sessions
+
+Always create sessions through `music_streaming.spark` so configuration lives in one place:
+
+```python
+from music_streaming.spark import SparkConfig, spark_session
+
+with spark_session(SparkConfig(app_name="daily-streams")) as spark:
+    spark.range(10).count()
+# the session is stopped here, even if the job raised an error
+```
+
+`SparkConfig.from_env()` (the default) reads these environment variables:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `MSP_SPARK_APP_NAME` | `music-streaming` | Name shown in the Spark UI and logs |
+| `MSP_SPARK_MASTER` | unset | Cluster URL, e.g. `local[4]`. Leave unset in production so `spark-submit --master` decides; locally PySpark then uses `local[*]` |
+| `MSP_SPARK_SHUFFLE_PARTITIONS` | `8` | `spark.sql.shuffle.partitions` (Spark's default of 200 is sized for clusters) |
+
 ## Troubleshooting
 
 - **Spark hangs or fails with `UnsupportedClassVersionError`**: Spark is using an old Java.
