@@ -70,6 +70,29 @@ uv run ruff check .           # lint
 uv run ruff format .          # format
 ```
 
+## Testing
+
+```bash
+uv run pytest tests/test_spark.py               # one file
+uv run pytest -k referential                    # tests whose name matches
+uv run pytest -x                                # stop at the first failure
+uv run ruff check . && uv run ruff format --check . && uv run pytest  # same checks as CI
+```
+
+Tests that need Spark use the `spark` fixture from `tests/conftest.py`: one local session per test
+module (`local[1]`, 1 shuffle partition, UI off), stopped when the module finishes. Such tests are
+marked `spark` automatically, so `-m "not spark"` gives a fast run with no JVM.
+
+## Continuous integration
+
+[GitHub Actions](.github/workflows/ci.yml) runs on every pull request and every push to `main`:
+
+- **lint**: `ruff check` and `ruff format --check`
+- **test**: `pytest` on Java 17 and Java 21 (Temurin), the supported range
+
+Dependencies are installed with `uv sync --locked`, so CI fails if `uv.lock` is out of date with
+`pyproject.toml`. Any failing check marks the PR red.
+
 ## Spark sessions
 
 Always create sessions through `music_streaming.spark` so configuration lives in one place:
@@ -123,6 +146,7 @@ Track popularity and user activity follow a long-tail distribution, like real st
 ```
 src/music_streaming/   # application package (src layout)
 tests/                 # pytest suite
+.github/workflows/     # CI pipeline
 pyproject.toml         # dependencies, Ruff and pytest configuration
 uv.lock                # exact locked dependency versions
 ```

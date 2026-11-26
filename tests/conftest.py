@@ -8,6 +8,9 @@ from pathlib import Path
 
 import pytest
 
+# Lets tests run pytest on generated test files (used to test the fixtures themselves).
+pytest_plugins = ["pytester"]
+
 MIN_JAVA_VERSION = 17
 
 # Spark's JVM launches separate Python worker processes. Point them at the
